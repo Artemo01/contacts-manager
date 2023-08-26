@@ -18,7 +18,6 @@ class _ContactPageState extends State<ContactPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     getAllContacts();
 
     super.initState();

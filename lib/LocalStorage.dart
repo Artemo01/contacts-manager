@@ -11,6 +11,14 @@ class LocalStorage {
     }
   }
 
+  Future<bool> getBool(String key) async {
+    try {
+      return (await store).getBool(key) ?? true;
+    } catch (e) {
+      return true;
+    }
+  }
+
   void saveStringList(String key, List<String> value) async {
     (await store).setStringList(key, value);
   }
@@ -19,5 +27,9 @@ class LocalStorage {
     List<String> list = await getStringList(key);
     list.add(item);
     saveStringList(key, list);
+  }
+
+  void saveBool(String key, bool value) async {
+    (await store).setBool(key, value);
   }
 }

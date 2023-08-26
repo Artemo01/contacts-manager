@@ -1,9 +1,9 @@
+import 'package:contacts_management/dto/NavigationButton.dart';
 import 'package:contacts_management/pages/CalendarPage.dart';
 import 'package:contacts_management/pages/Contacts.dart';
 import 'package:contacts_management/pages/Dashboard.dart';
 import 'package:contacts_management/pages/Notebook.dart';
 import 'package:contacts_management/pages/Settings.dart';
-import 'package:contacts_management/widgets/NavigationButton.dart';
 import 'package:flutter/material.dart';
 
 class NavigationDrawer extends StatefulWidget {
