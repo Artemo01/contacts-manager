@@ -1,8 +1,11 @@
-import 'package:contacts_management/consts.dart';
-import 'package:contacts_management/widgets/NewNotePage.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../LocalStorage.dart';
+import '../consts.dart';
+import '../dto/Note.dart';
+import '../widgets/NoteDetailPage.dart';
 
 class Notebook extends StatefulWidget {
   const Notebook({Key? key}) : super(key: key);
@@ -13,94 +16,140 @@ class Notebook extends StatefulWidget {
 
 class _NotebookState extends State<Notebook> {
   LocalStorage store = LocalStorage();
-  List<String> notebookList = [];
+  List<Note> notes = [];
+  bool isEditMode = false;
 
   @override
   void initState() {
+    getNotes();
     super.initState();
-
-    store
-        .getStringList(NOTES)
-        .then((value) => setState(() => notebookList = value));
   }
 
-  void createNewNote(String text) {
-    List<String> newNotebookList = notebookList;
-    newNotebookList.insert(0, text);
-    setState(() {
-      notebookList = newNotebookList;
+  void getNotes() {
+    store.getStringList(NOTES).then((value) {
+      List<Note> initialNotes = [];
+      value.forEach((element) {
+        Map<String, dynamic> eventJson = jsonDecode(element);
+        Note initialEvent = Note.fromJson(eventJson);
+        initialNotes.add(initialEvent);
+      });
+      setState(() {
+        notes = initialNotes;
+      });
     });
-    store.saveStringList(NOTES, notebookList);
   }
 
-  void updateNote(String text, int index) {
-    List<String> newNotebookList = notebookList;
-    newNotebookList[index] = text;
-    setState(() {
-      notebookList = newNotebookList;
+  void convertNotesToStrings() {
+    List<String> stingNotes = [];
+    notes.forEach((element) {
+      stingNotes.add(jsonEncode(element));
     });
-    store.saveStringList(NOTES, notebookList);
+    store.saveStringList(NOTES, stingNotes);
   }
 
-  void openNotePage(
-    String title,
-    Function noteFunction,
-    String initialText,
-    int index,
-  ) {
-    Navigator.push(
+  void _navigateToNoteDetail(int index) async {
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NewNotePage(
-          title: title,
-          saveNote: noteFunction,
-          initialText: initialText,
-          index: index,
-        ),
-      ),
+          builder: (context) =>
+              NoteDetailPage(note: index >= 0 ? notes[index] : null)),
     );
+
+    if (result != null) {
+      setState(() {
+        if (index >= 0) {
+          notes[index] = result;
+        } else {
+          notes.add(result);
+        }
+      });
+      convertNotesToStrings();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView.builder(
-          itemCount: notebookList.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Card(
-              child: ListTile(
-                title: Text(
-                  notebookList[index],
-                  maxLines: 1,
-                ),
-                onTap: () => openNotePage(
-                  notebookList[index],
-                  updateNote,
-                  notebookList[index],
-                  index,
-                ),
-              ),
-            );
-          }),
-      // body: ListView(
-      //   children: notebookList
-      //       .map(
-      //         (title) => Card(
-      //           child: ListTile(
-      //             title: Text(
-      //               title,
-      //               maxLines: 1,
-      //             ),
-      //             onTap: () => openNotePage(title, updateNote, title),
-      //           ),
-      //         ),
-      //       )
-      //       .toList(),
-      // ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => openNotePage("New note", createNewNote, "", 0),
-        child: const Icon(Icons.add),
+        itemCount: notes.length,
+        itemBuilder: (context, index) {
+          return Card(
+            child: ListTile(
+              title: Text(notes[index].title),
+              onTap: isEditMode
+                  ? () {
+                      setState(() {
+                        notes[index].isSelected = !notes[index].isSelected;
+                      });
+                    }
+                  : () {
+                      _navigateToNoteDetail(index);
+                    },
+              onLongPress: () {
+                if (!isEditMode) {
+                  setState(() {
+                    isEditMode = true;
+                    notes[index].isSelected = true;
+                  });
+                }
+              },
+              trailing: isEditMode
+                  ? Checkbox(
+                      value: notes[index].isSelected,
+                      onChanged: (value) {
+                        setState(() {
+                          notes[index].isSelected = value ?? false;
+                        });
+                      },
+                    )
+                  : null,
+            ),
+          );
+        },
       ),
+      floatingActionButton: !isEditMode
+          ? FloatingActionButton(
+              onPressed: () {
+                _navigateToNoteDetail(-1);
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
+      bottomNavigationBar: isEditMode
+          ? BottomAppBar(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        notes.removeWhere((note) => note.isSelected);
+                      });
+                    },
+                    child: const Icon(Icons.delete),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        for (final note in notes) {
+                          note.isSelected = false;
+                        }
+                      });
+                    },
+                    child: const Icon(Icons.deselect),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        isEditMode = false;
+                      });
+                    },
+                    child: const Icon(Icons.keyboard_return_sharp),
+                  ),
+                ],
+              ),
+            )
+          : null,
     );
   }
 }
