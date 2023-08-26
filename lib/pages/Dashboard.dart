@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../LocalStorage.dart';
 import '../consts.dart';
+import '../dto/Event.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -12,17 +15,38 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   LocalStorage store = LocalStorage();
+  int eventsNumber = 0;
   String contactsNumber = '0';
 
   @override
   void initState() {
     getContacts();
+    getEvents();
     super.initState();
   }
 
   void getContacts() {
     store.getStringList(CONTACTS).then(
         (value) => setState(() => contactsNumber = value.length.toString()));
+  }
+
+  void getEvents() {
+    store.getStringList(EVENTS).then((value) {
+      value.forEach((element) {
+        Map<String, dynamic> parsedJson = jsonDecode(element);
+        parsedJson.forEach((key, value) {
+          List<Event> eventsList = [];
+          for (var element in value) {
+            Map<String, dynamic> eventJson = jsonDecode(element);
+            Event event = Event.fromJson(eventJson);
+            eventsList.add(event);
+          }
+          setState(() {
+            eventsNumber = eventsNumber + eventsList.length;
+          });
+        });
+      });
+    });
   }
 
   @override
@@ -36,13 +60,13 @@ class _DashboardState extends State<Dashboard> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(0, 16.0, 0, 16.0),
                   child: Column(
-                    children: const [
+                    children: [
                       ListTile(
                         leading: Icon(Icons.calendar_today),
                         title: Text('Scheduled'),
                         subtitle: Center(
                           child: Text(
-                            '0',
+                            eventsNumber.toString(),
                             style: TextStyle(fontSize: 32.0),
                           ),
                         ),

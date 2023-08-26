@@ -67,6 +67,23 @@ class _CalendarPageState extends State<CalendarPage> {
     });
   }
 
+  void _deleteEvent(Event event) {
+    setState(() {
+      selectedEvents[selectedDay]?.remove(event);
+    });
+
+    List<String> selectedStringList = [];
+    selectedEvents.forEach((key, value) {
+      List<String> eventList = [];
+      value.forEach((element) {
+        eventList.add(jsonEncode(element));
+      });
+      selectedStringList.add(jsonEncode({key.toString(): eventList}));
+    });
+
+    store.saveStringList(EVENTS, selectedStringList);
+  }
+
   void _addEvent() {
     showDialog(
       context: context,
@@ -207,6 +224,12 @@ class _CalendarPageState extends State<CalendarPage> {
                   title: Text(event.title),
                   subtitle: Text(
                     '${event.startTime.hour}:${event.startTime.minute} - ${event.endTime.hour}:${event.endTime.minute}',
+                  ),
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      _deleteEvent(event); // Dodaj funkcję usuwania
+                    },
                   ),
                 );
               },
