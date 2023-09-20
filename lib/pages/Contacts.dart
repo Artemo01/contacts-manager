@@ -6,6 +6,8 @@ import 'package:contacts_management/pages/ContactPage.dart';
 import 'package:contacts_management/widgets/NewContactPage.dart';
 import 'package:flutter/material.dart';
 
+import '../dto/Event.dart';
+
 class Contacts extends StatefulWidget {
   const Contacts({Key? key}) : super(key: key);
 
@@ -15,12 +17,13 @@ class Contacts extends StatefulWidget {
 
 class _ContactsState extends State<Contacts> {
   List<String> contacts = [];
+  List<Event> eventsList = [];
   LocalStorage store = LocalStorage();
 
   @override
   void initState() {
     super.initState();
-
+    getEvents();
     store
         .getStringList(CONTACTS)
         .then((value) => setState(() => contacts = value));
@@ -50,7 +53,27 @@ class _ContactsState extends State<Contacts> {
         MaterialPageRoute(
             builder: (context) => ContactPage(
                   contact: contact,
+                  eventsList: eventsList,
                 )));
+  }
+
+  void getEvents() {
+    store.getStringList(EVENTS).then((value) {
+      List<Event> selectedEventsList = [];
+      value.forEach((element) {
+        Map<String, dynamic> parsedJson = jsonDecode(element);
+        parsedJson.forEach((key, value) {
+          for (var element in value) {
+            Map<String, dynamic> eventJson = jsonDecode(element);
+            Event event = Event.fromJson(eventJson);
+            selectedEventsList.add(event);
+          }
+        });
+      });
+      setState(() {
+        eventsList = selectedEventsList;
+      });
+    });
   }
 
   @override

@@ -18,7 +18,7 @@ class NewContactPage extends StatefulWidget {
 class _NewContactPageState extends State<NewContactPage> {
   late String _name;
   late String _last;
-  late String _company;
+  late String _company = "none";
   late String _phone;
 
   void validateData() {
@@ -51,38 +51,41 @@ class _NewContactPageState extends State<NewContactPage> {
           )
         ],
       ),
-      body: ListView(
-        children: [
-          TextField(
-            onChanged: (value) => _name = value,
-            decoration: const InputDecoration(
-              labelText: "First name",
-              hintText: 'Enter your name',
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+        child: ListView(
+          children: [
+            TextField(
+              onChanged: (value) => _name = value,
+              decoration: const InputDecoration(
+                labelText: "First name",
+                hintText: 'Enter your name',
+              ),
             ),
-          ),
-          TextField(
-            onChanged: (value) => _last = value,
-            decoration: const InputDecoration(
-              labelText: "Last name",
-              hintText: 'Enter your last name',
+            TextField(
+              onChanged: (value) => _last = value,
+              decoration: const InputDecoration(
+                labelText: "Last name",
+                hintText: 'Enter your last name',
+              ),
             ),
-          ),
-          TextField(
-            keyboardType: TextInputType.number,
-            onChanged: (value) => _phone = value,
-            decoration: const InputDecoration(
-              labelText: "Phone number",
-              hintText: 'Enter phone number',
+            TextField(
+              keyboardType: TextInputType.number,
+              onChanged: (value) => _phone = value,
+              decoration: const InputDecoration(
+                labelText: "Phone number",
+                hintText: 'Enter phone number',
+              ),
             ),
-          ),
-          TextField(
-            onChanged: (value) => _company = value,
-            decoration: const InputDecoration(
-              labelText: "Company",
-              hintText: 'Enter company name',
+            TextField(
+              onChanged: (value) => _company = value,
+              decoration: const InputDecoration(
+                labelText: "Company",
+                hintText: 'Enter company name',
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

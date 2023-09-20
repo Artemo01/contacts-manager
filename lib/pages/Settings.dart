@@ -43,6 +43,10 @@ class _SettingsState extends State<Settings> {
     setState(() => localContacts = []);
   }
 
+  void removeEvents() {
+    store.saveStringList(EVENTS, []);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,6 +61,16 @@ class _SettingsState extends State<Settings> {
             leading: const Icon(Icons.delete),
             title: const Text('Remove Contacts'),
             onTap: () => removeContacts(),
+          ),
+          ListTile(
+            leading: const Icon(Icons.event_busy),
+            title: const Text('Remove All Events'),
+            onTap: () => removeEvents(),
+          ),
+          ListTile(
+            leading: const Icon(Icons.info),
+            title: const Text('Info'),
+            onTap: () {},
           ),
         ],
       ),

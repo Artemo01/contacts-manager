@@ -20,6 +20,7 @@ class _CalendarPageState extends State<CalendarPage> {
   CalendarFormat format = CalendarFormat.month;
   DateTime selectedDay = DateTime.now();
   DateTime focusedDay = DateTime.now();
+  List<String> contacts = [];
 
   List<Event> _getEventsFromDay(DateTime date) {
     return selectedEvents[date] ?? [];
@@ -28,7 +29,14 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   void initState() {
     getEventList();
+    getContactsList();
     super.initState();
+  }
+
+  void getContactsList() {
+    store
+        .getStringList(CONTACTS)
+        .then((value) => setState(() => contacts = value));
   }
 
   void getEventList() {
@@ -85,6 +93,13 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   void _addEvent() {
+    List<String> dropdownList = [];
+    contacts.forEach((element) {
+      Map<String, dynamic> contact = jsonDecode(element);
+      dropdownList.add(contact["displayName"]);
+    });
+    dropdownList.insert(0, "No selected");
+    String dropdownValue = dropdownList.first;
     showDialog(
       context: context,
       builder: (context) {
@@ -144,6 +159,22 @@ class _CalendarPageState extends State<CalendarPage> {
                       setState(() => endTime = newTime);
                     },
                   ),
+                  DropdownButton(
+                    value: dropdownValue,
+                    icon: const Icon(Icons.arrow_downward),
+                    items: dropdownList
+                        .map<DropdownMenuItem<String>>(
+                            (e) => DropdownMenuItem<String>(
+                                  value: e,
+                                  child: Text(e),
+                                ))
+                        .toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        dropdownValue = value!;
+                      });
+                    },
+                  )
                 ],
               );
             },
@@ -164,11 +195,13 @@ class _CalendarPageState extends State<CalendarPage> {
                     if (eventName.isNotEmpty) {
                       selectedEvents[selectedDay] =
                           selectedEvents[selectedDay] ?? [];
-                      selectedEvents[selectedDay]!.add(Event(
-                        title: eventName,
-                        startTime: startTime,
-                        endTime: endTime,
-                      ));
+                      selectedEvents[selectedDay]!.add(
+                        Event(
+                            title: eventName,
+                            startTime: startTime,
+                            endTime: endTime,
+                            phoneNumber: dropdownValue),
+                      );
                     }
                   },
                 );
@@ -226,9 +259,9 @@ class _CalendarPageState extends State<CalendarPage> {
                     '${event.startTime.hour}:${event.startTime.minute} - ${event.endTime.hour}:${event.endTime.minute}',
                   ),
                   trailing: IconButton(
-                    icon: Icon(Icons.delete),
+                    icon: const Icon(Icons.delete),
                     onPressed: () {
-                      _deleteEvent(event); // Dodaj funkcję usuwania
+                      _deleteEvent(event);
                     },
                   ),
                 );

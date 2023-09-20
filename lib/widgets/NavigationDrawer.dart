@@ -49,6 +49,13 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Contact Management'),
+        actions: [
+          if (bodyWidget is Contacts)
+            IconButton(
+              icon: const Icon(Icons.filter_alt),
+              onPressed: () {},
+            ),
+        ],
       ),
       drawer: Drawer(
         child: ListView(
@@ -65,7 +72,9 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
           );
         }).toList()),
       ),
-      body: bodyWidget,
+      body: Padding(
+          padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+          child: bodyWidget),
     );
   }
 }
