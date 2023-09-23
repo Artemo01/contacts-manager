@@ -38,7 +38,7 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     NavigationButton(
       name: 'Settings',
       icon: Icons.settings,
-      widget: Settings(),
+      widget: const Settings(),
     )
   ];
 
@@ -49,13 +49,6 @@ class _NavigationDrawerState extends State<NavigationDrawer> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Contact Management'),
-        actions: [
-          if (bodyWidget is Contacts)
-            IconButton(
-              icon: const Icon(Icons.filter_alt),
-              onPressed: () {},
-            ),
-        ],
       ),
       drawer: Drawer(
         child: ListView(

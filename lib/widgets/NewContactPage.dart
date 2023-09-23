@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:contacts_management/LocalStorage.dart';
+import 'package:contacts_management/consts.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 
@@ -16,10 +18,20 @@ class NewContactPage extends StatefulWidget {
 }
 
 class _NewContactPageState extends State<NewContactPage> {
+  LocalStorage store = LocalStorage();
+  List<String> companies = [];
   late String _name;
   late String _last;
   late String _company = "none";
   late String _phone;
+
+  @override
+  void initState() {
+    store
+        .getStringList(COMPANIES)
+        .then((value) => setState(() => companies = value));
+    super.initState();
+  }
 
   void validateData() {
     var newContact = Contact.fromMap({
@@ -35,7 +47,7 @@ class _NewContactPageState extends State<NewContactPage> {
       ],
     });
 
-    widget.addContact(jsonEncode(newContact.toMap()));
+    widget.addContact(jsonEncode(newContact.toMap()), _company);
     Navigator.pop(context);
   }
 

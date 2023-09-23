@@ -40,6 +40,7 @@ class _SettingsState extends State<Settings> {
 
   void removeContacts() {
     store.saveStringList(CONTACTS, []);
+    store.saveStringList(COMPANIES, []);
     setState(() => localContacts = []);
   }
 
