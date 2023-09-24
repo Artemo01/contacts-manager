@@ -48,6 +48,37 @@ class _SettingsState extends State<Settings> {
     store.saveStringList(EVENTS, []);
   }
 
+  void showInfo() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("App info"),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Text("Application created by:"),
+                  Text("Jakub Budziński"),
+                  Text("App version: 1.0.0")
+                ],
+              );
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,7 +102,7 @@ class _SettingsState extends State<Settings> {
           ListTile(
             leading: const Icon(Icons.info),
             title: const Text('Info'),
-            onTap: () {},
+            onTap: () => showInfo(),
           ),
         ],
       ),

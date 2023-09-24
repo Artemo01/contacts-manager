@@ -17,20 +17,23 @@ class Contacts extends StatefulWidget {
 
 class _ContactsState extends State<Contacts> {
   List<String> contacts = [];
+  List<String> filteredContacts = [];
   List<Event> eventsList = [];
   List<String> companies = [];
   LocalStorage store = LocalStorage();
   TextEditingController filterController = TextEditingController();
   bool ascendingOrder = false;
+  String filterByCompany = "";
 
   @override
   void initState() {
     super.initState();
     getEvents();
     getCompanies();
-    store
-        .getStringList(CONTACTS)
-        .then((value) => setState(() => contacts = value));
+    store.getStringList(CONTACTS).then((value) => setState(() {
+          contacts = value;
+          filteredContacts = value;
+        }));
   }
 
   void getCompanies() {
@@ -97,7 +100,7 @@ class _ContactsState extends State<Contacts> {
   }
 
   void _sortContacts() {
-    contacts.sort((a, b) {
+    filteredContacts.sort((a, b) {
       Map<String, dynamic> contactA = jsonDecode(a);
       Map<String, dynamic> contactB = jsonDecode(b);
       String displayNameA = contactA['displayName'];
@@ -107,6 +110,19 @@ class _ContactsState extends State<Contacts> {
           : displayNameB.compareTo(displayNameA);
     });
     setState(() {});
+  }
+
+  void sortByCompanies() {
+    var sorted = contacts;
+    if (filterByCompany != "---") {
+      sorted = filteredContacts
+          .where((element) => jsonDecode(element)['company'] == filterByCompany)
+          .toList();
+    }
+
+    setState(() {
+      filteredContacts = sorted;
+    });
   }
 
   void showFilters() {
@@ -148,6 +164,8 @@ class _ContactsState extends State<Contacts> {
                       onChanged: (String? value) {
                         setState(() {
                           dropdownValue = value!;
+                          filterByCompany = dropdownValue;
+                          sortByCompanies();
                         });
                       },
                     ),
@@ -196,9 +214,10 @@ class _ContactsState extends State<Contacts> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: contacts.length,
+              itemCount: filteredContacts.length,
               itemBuilder: (context, index) {
-                Map<String, dynamic> contact = jsonDecode(contacts[index]);
+                Map<String, dynamic> contact =
+                    jsonDecode(filteredContacts[index]);
                 if (filterController.text.isEmpty ||
                     contact['displayName']
                         .toLowerCase()

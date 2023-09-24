@@ -72,13 +72,17 @@ class _DashboardState extends State<Dashboard> {
                     child: Column(
                       children: [
                         ListTile(
-                          leading: Icon(Icons.calendar_today),
                           title: Text('Scheduled'),
                           subtitle: Center(
-                            child: Text(
-                              eventsNumber.toString(),
-                              style: TextStyle(fontSize: 32.0),
-                            ),
+                            child: Row(children: [
+                              Expanded(child: Icon(Icons.calendar_today)),
+                              Expanded(
+                                child: Text(
+                                  eventsNumber.toString(),
+                                  style: TextStyle(fontSize: 32.0),
+                                ),
+                              ),
+                            ]),
                           ),
                         )
                       ],
@@ -93,16 +97,18 @@ class _DashboardState extends State<Dashboard> {
                     child: Column(
                       children: [
                         ListTile(
-                          leading: const Icon(
-                            Icons.phone,
-                          ),
                           title: const Text('Contacts'),
                           subtitle: Center(
-                            child: Text(
-                              contactsNumber,
-                              style: const TextStyle(fontSize: 32.0),
-                            ),
-                          ),
+                              child: Row(
+                            children: [
+                              Expanded(child: Icon(Icons.phone)),
+                              Expanded(
+                                  child: Text(
+                                contactsNumber,
+                                style: const TextStyle(fontSize: 32.0),
+                              ))
+                            ],
+                          )),
                         )
                       ],
                     ),

@@ -31,7 +31,7 @@ class _ContactPageState extends State<ContactPage> {
   void getAllContacts() {
     widget.contact['phones'].forEach(
       (element) {
-        String number = element['value'].replaceAll(new RegExp(r'[^0-9]'), '');
+        String number = element['value'].replaceAll(RegExp(r'[^\d+]+'), '');
         contactWidgets.insert(
           0,
           Card(
